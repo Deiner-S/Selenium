@@ -25,7 +25,7 @@ driver.implicitly_wait(5)
 
 lista = []
 
-for indice in range(424,463):
+for indice in range(462,463):
     try:
         driver.get(f"https://fau.softcomshop.com.br/nfe2/{indice}/editar")
         
