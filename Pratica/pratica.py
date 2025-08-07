@@ -38,11 +38,13 @@ for indice in range(424,463):
             print ("Botão não encontrado")
         
         html = driver.page_source
+        
         soup = BeautifulSoup(html,"html.parser")
+
         dados = {
         "chave_nota" : soup.find("span", class_="access_key_nfe").text,
         "numero da nota" : soup.find("span", class_="number_nfe").text,
-        #"cpf" : soup.find("input", class_="form-control mask_cpf_cnpj")["value"],
+        "cpf" : soup.find("input", class_="form-control mask_cpf_cnpj")["value"],
         "valor da nota": soup.find("span", id="total_produto_valor").text,
         "CFOP":soup.find("input", id="auto_natureza")["value"]}
 
