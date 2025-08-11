@@ -1,6 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from extraction_pages import ExtractionPages as ep
+
 import time
 import pandas as pd
 
@@ -8,21 +9,9 @@ import pandas as pd
 
 
 driver = webdriver.Chrome()
-driver.get("https://fau.softcomshop.com.br/auth/login")
+driver.get()
 
-input_login = driver.find_element(By.CSS_SELECTOR, "#login-email")
-input_senha = element = driver.find_element(By.CSS_SELECTOR, "#login-senha")
-button_login = driver.find_element(By.CSS_SELECTOR, "#login-acessar")
 
-login = ""
-input_login.send_keys(login)
-
-senha = ""
-input_senha.send_keys(senha)
-
-button_login.click()
-
-driver.implicitly_wait(5)
 
 lista = []
 
