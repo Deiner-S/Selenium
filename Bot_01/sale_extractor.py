@@ -7,22 +7,24 @@ import time
 
 
 class SaleExtractor():
-    def __init__(self,login,senha,options):
-        self._login = login
-        self._senha = senha
-        self.sales = []
+    def __init__(self,options,rang1,range2):
+        
+        self._sales = []
         self._driver = webdriver.Chrome(options)
         self._url = "https://fau.softcomshop.com.br/auth/login"
-        
+        self._range = [rang1,range2]
+
+    def get_sales(self):
+        return self._sales
 
     def try_run(self):
         self._try(self._run)
 
     def _run(self):        
         self._driver.get(self._url)
-        self._try(self._logon,self._login,self._senha)
+        self._try(self._logon,"deiner.souza@ufu.br","Sucesso@369")
 
-        for indice in range(423,425):
+        for indice in range(self.range[0],self.range[1]):
             self._wait_find("""//*[@id="menu"]""")            
             self._driver.get(f"https://fau.softcomshop.com.br/nfe2/{indice}/editar")            
             self._try(self._extract)
@@ -69,7 +71,7 @@ class SaleExtractor():
         for indice in range(1,num_xpath_tr):
             sold_book = self._try(self._get_products, indice)
             if sold_book is not None:
-                self.sales.append(sold_book)            
+                self._sales.append(sold_book)            
         return 
         
     def _get_products(self,indice):
