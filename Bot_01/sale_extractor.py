@@ -7,8 +7,8 @@ import time
 
 
 class SaleExtractor():
-    def __init__(self,options,rang1,range2):
-        
+    def __init__(self,login,options,rang1,range2):
+        self._login = login  
         self._sales = []
         self._driver = webdriver.Chrome(options)
         self._url = "https://fau.softcomshop.com.br/auth/login"
@@ -22,9 +22,9 @@ class SaleExtractor():
 
     def _run(self):        
         self._driver.get(self._url)
-        self._try(self._logon,"deiner.souza@ufu.br","Sucesso@369")
+        self._try(self._logon,str(self._login[0]),str(self._login[1]))
 
-        for indice in range(self.range[0],self.range[1]):
+        for indice in range(self._range[0],self._range[1]):
             self._wait_find("""//*[@id="menu"]""")            
             self._driver.get(f"https://fau.softcomshop.com.br/nfe2/{indice}/editar")            
             self._try(self._extract)
@@ -48,20 +48,6 @@ class SaleExtractor():
         input_senha.clear()
         input_senha.send_keys(senha)
         button_login.click()
-
-
-    
-        
-        data = {
-        "CHAVE" : self._driver.find_element(By.XPATH, """//*[@id="nfe-info"]/div[5]/span""").text,
-        "NUMERO" : self._driver.find_element(By.XPATH, """//*[@id="nfe-info"]/div[1]/span""").text,
-        "DATA" : self._driver.find_element(By.XPATH, """//*[@id="data_hora_emissao"]""").get_attribute("value"),
-        #"CPF" : self._driver.find_element(By.XPATH, """//*[@id="destinatario_cpf_cnpj"]""").get_attribute("value"),
-        #"CEP": self._driver.find_element(By.XPATH, """//*[@id="destinatario_cep"]""").get_attribute("value"),
-        #"VALOR": self._driver.find_element(By.XPATH, """/html/body/div[2]/div/div[2]/div/div/div[1]/div[3]/div/div[2]/div[3]/div[2]/form/div/div[7]/div/div/div[2]/div/form/div[5]/div/div[1]/div[8]/span""").text,
-        "CFOP": self._driver.find_element(By.XPATH, """//*[@id="auto_natureza"]""").get_attribute("value")}
-        print("get register ok")
-        return data
 
     def _grup_sales(self):        
         self._wait_find("""//*[@id="nfe-items"]""")

@@ -7,13 +7,13 @@ class App():
 
     def __init__(self):
         self._options = Options()
-        self._chave = b'9xxYPUDp8ZK1R67zIEwnozyTktVfpF6Cr5C4kbbmZPM='  
+        self._chave = b''
         self._fernet = Fernet(self._chave)
     
     def run(self):        
         self._configure_options()
-
-        sales_extractor= se(self._options,423,427)
+        login = self._decrypt_login()
+        sales_extractor= se(login,self._options,423,427)
         sales_extractor.try_run()
         sales = sales_extractor.get_sales()
         print(sales)
