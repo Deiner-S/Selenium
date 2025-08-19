@@ -13,7 +13,7 @@ class App():
     def run(self):        
         self._configure_options()
         login = self._decrypt_login()
-        sales_extractor= se(login,self._options,423,427)
+        sales_extractor= se(login,self._options)
         sales_extractor.try_run()
         sales = sales_extractor.get_sales()
         print(sales)

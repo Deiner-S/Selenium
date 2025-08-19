@@ -2,17 +2,17 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+import requests
 import numpy as np
 import time
 
 
 class SaleExtractor():
-    def __init__(self,login,options,rang1,range2):
-        self._login = login  
+    def __init__(self,login_password,options):
+        self._login_password = login_password  
         self._sales = []
         self._driver = webdriver.Chrome(options)
         self._url = "https://fau.softcomshop.com.br/auth/login"
-        self._range = [rang1,range2]
 
     def get_sales(self):
         return self._sales
@@ -22,23 +22,20 @@ class SaleExtractor():
 
     def _run(self):        
         self._driver.get(self._url)
-        self._try(self._logon,str(self._login[0]),str(self._login[1]))
+        self._try(self._logon,str(self._login_password[0]),str(self._login_password[1]))
 
-        for indice in range(self._range[0],self._range[1]):
+        for indice in range(1,463):
             self._wait_find("""//*[@id="menu"]""")            
-            self._driver.get(f"https://fau.softcomshop.com.br/nfe2/{indice}/editar")            
-            self._try(self._extract)
-            
+            self._driver.get(f"https://fau.softcomshop.com.br/nfe2/{indice}/editar")
+            self._try(self._remov_pop_up)
+            self._try(self._next_page)
+            self._try(self._grup_sales)
+
             random_delay = np.random.uniform(1,3)
             time.sleep(random_delay)
 
         self._driver.quit()
-
-    def _extract(self):
-        self._try(self._remov_pop_up) 
-        self._next_page()
-        self._grup_sales()        
-        
+    
     def _logon(self,login,senha):
         input_login = self._wait_find("""//*[@id="login-email"]""")
         input_senha = self._wait_find("""//*[@id="login-senha"]""")
@@ -48,17 +45,33 @@ class SaleExtractor():
         input_senha.clear()
         input_senha.send_keys(senha)
         button_login.click()
-
-    def _grup_sales(self):        
-        self._wait_find("""//*[@id="nfe-items"]""")
-        num_xpath_tr = len(self._driver.find_elements(By.XPATH,"""//*[@id="table-form-body"]/tr"""))
-        print(f"itens na nota: {num_xpath_tr}")
+    
+    def _get_range(self):
+        indice = 1
+        while True:
+            url = f"https://fau.softcomshop.com.br/nfe2/{indice}"
+            r = requests.get(url)
+            if r.status_code == 404:
+                return  indice
+            elif r.status_code != 200:
+                print(f"Atenção: status {r.status_code} na página {indice}, ignorando.")
+                continue
+            indice +1               
         
-        for indice in range(1,num_xpath_tr):
+    def _grup_sales(self):        
+        volumes = self._get_volumes()
+               
+        print(f"itens na nota: {volumes}")
+        
+        for indice in range(1,volumes+1):
             sold_book = self._try(self._get_products, indice)
             if sold_book is not None:
-                self._sales.append(sold_book)            
-        return 
+                self._sales.append(sold_book)
+
+    def _get_volumes(self):
+        str_volumes = self._wait_find("""/html/body/div[2]/div/div[2]/div/div/div[1]/div[3]/div/div[2]/div[4]/div[2]/div[2]/div[1]/div/div[2]/div/form/div[5]/div/div[1]/div[6]/span""").text
+        int_volumes = int(float(str_volumes.replace(",",".")))
+        return int_volumes
         
     def _get_products(self,indice):
         sold_book = {
@@ -95,5 +108,4 @@ class SaleExtractor():
 
     def _wait_find(self,element):
         return WebDriverWait(self._driver, 10).until(EC.presence_of_element_located((By.XPATH, element)))
-        
         
